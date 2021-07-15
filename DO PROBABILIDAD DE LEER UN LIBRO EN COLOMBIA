@@ -1,0 +1,105 @@
+clear all
+use "C:\Users\sergio perdomo\Documents\ALVARO\METODOS\ECCEFINAL.dta"
+
+label variable P5380´ " En los últimos 12 meses, ¿leyó libros? (incluya libros impresos o digitales)"
+label variable  P5785 "¿cuántos años cumplidos tiene <...>?"
+label variable  P6020 "Sexo: Hombre o Mujer"
+label variable P6170 "¿actualmente <...>asiste al preescolar, escuela, colegio o universidad?"
+label variable  P203S1 "Usted recibe algn ingreso mensual? cuanto recibe?"
+label variable  P271 "De acuerdo con su cultura, pueblo o rasgos fsicos, el nio o la nia se reconoce de alguna cultura si o no?"
+label variable P6070 "Actualmente: (solamente para personas de 12 aos y ms: Esta soltero"
+label variable  P260 "¿cuál es el nivel educativo más alto alcanzado por <...>"
+
+keep P5380´ P5785 P6020 P6170 P203S1 P271 P6070 P260
+
+rename P5785 Age
+rename P6020 Gender
+rename P6170 studying
+rename P203S1 hicome
+rename P271 skin
+rename P6070 married
+rename P260 educationlevel
+
+
+des 
+sum
+tab P5380´
+gen Sihaleido=0
+replace Sihaleido =1 if P5380´==2
+
+logit Sihaleido Age Gender studying hicome skin married educationlevel
+*Como la probabilidad del chi2 es 0.000,podemos decir que  el  modelo es globalmente significativo a todos los niveles de confianza.
+*El conjunto de mis variables independientes , me explican aproximadamente un 6,88% una variacion de mi variable dependiente. 
+
+*Por cada año de edad adicional de una persona, la probabilidad de lee un libro en los ultimos 12 meses  disminuye en 1.1%, mantiendo la demas variables constantes.
+*Si es mujer,la probabilidad de lee un libro en los ultimos 12 meses aumenta  en 20%, manteniendo las demas varibles constantes.
+*Si la persona esta estudiando,la probabilidad de lee un libro en los ultimos 12 meses aumenta 31.3%, manteniendo las demas varibles constantes.
+*(Por cada mil pesos adicionales en los ingresos totales, la probabilidad de lee un libro en los ultimos 12 meses aumenta en 0.3%, mantiendo las demas varibles constantes.
+*Si la persona no se identifica en alguna cultura, la probabilidad de lee un libro en los ultimos 12 meses aumenta en 55%, manteniendo las demas varibles constantes.
+*si la persona es diferente a soltero, la probabilidad de lee un libro en los ultimos 12 meses  disminuye en 86%, manteniendo las demas variables constantes.
+*Un nivel de educacion mas aumenta la probabilidad de lee un libro en los ultimos 12 meses 60%, mantiendo las demas varibles constantes.
+
+logit  Sihaleido Age i.Gender i.studying hicome skin  i.married educationlevel, baselevels
+*Se estima el modelo por categorias
+*Este tiene el mismo analisis del modelo anterior.
+logit Sihaleido Age Gender studying hicome skin married educationlevel
+margins, atmeans
+*un individuo con las caracteristicas promedio de las variables, tiene la probabilidad de lee un libro en los ultimos 12 meses de 36,12%.
+margins, at(Age= 33.50123 Gender= .6216246 studying= .6971132 hicome= 43.86992 skin= .722475  married= .0756378 educationlevel = 4.615881 )
+
+
+margins, dydx(*) atmeans
+
+*Estimacion de  los efectos parciales o derivas parciales, que se usa para determinar las diferencias entre las categorias de las variables. 
+*De esta forma es como se analizan las variables individuales. 
+
+*Por cada año de edad adicional de una persona, por encima de la media, la probabilidad de lee un libro en los ultimos 12 meses  disminuye en 0,2%,
+*Si es mujer, por encima de la media, la probabilidad de lee un libro en los ultimos 12 meses aumenta  en 4%
+**Si la persona esta estudiando, por ecima de la media, la probabilidad de lee un libro en los ultimos 12 meses aumenta 7%
+*Por cada mil pesos adicionales en los ingresos totales, por encima de la media, la probabilidad de lee un libro en los ultimos 12 meses aumenta en 0.7%
+*Si la persona no se identifica en alguna cultura, por encima de la media, la probabilidad de lee un libro en los ultimos 12 meses aumenta en 12%
+*si la persona es diferente a soltero,por encima de la media,  la probabilidad de lee un libro en los ultimos 12 meses  disminuye en 19%
+*A medida que aumenta los niveles de educacion, por encima de la media, la probabilidad de lee un libro en los ultimos 12 mesesaumenta en 13%
+
+margins, at(Age= 33.50123 Gender= 0 studying= .6971132 hicome= 43.86992 skin= .722475  married= .0756378 educationlevel = (1(1)5) )
+*PARA UNA PERSONA QUE SEA HOMBRE
+
+*Para una persona que sea hombre, que no tenga ningun estudio tiene una probabilidad del 5% de leer un libro en los ultimos 12 meses.
+*Para una persona que sea hombre, que tenga prescolar tiene una probabilidad del 9% de leer un libro en los ultimos 12 meses.
+*Para una persona que sea hombre, que tenga Básica Primaria (1°-5°) y Básica Secundaria (6°-9°) tiene una probabilidad del 16% de leer un libro en los ultimos 12 meses.
+*Para una persona que sea hombre, que tenga Media (10°-13°) tiene una probabilidad del 16% de leer un libro en los ultimos 12 meses.
+*Para una persona que sea hombre, que tenga Superior (Técnica, Tecnológica, Universitaria - pregrado) o	Posgrado (especialización, maestría, doctorado)  tiene una probabilidad del 38% de leer un libro en los ultimos 12 meses.
+
+margins, at(Age= 33.50123 Gender= 1 studying= .6971132 hicome= 43.86992 skin= .722475  married= .0756378 educationlevel = (1(1)5) )
+
+*PARA UNA PERSONA QUE SEA MUJER
+*Para una persona que sea Mujer, que no tenga ningun estudio tiene una probabilidad del 6% de leer un libro en los ultimos 12 meses.
+*Para una persona que sea Mujer, que tenga prescolar tiene una probabilidad del 11% de leer un libro en los ultimos 12 meses.
+*Para una persona que sea Mujer, que tenga Básica Primaria (1°-5°) y Básica Secundaria (6°-9°) tiene una probabilidad del 18% de leer un libro en los ultimos 12 meses.
+*Para una persona que sea Mujer, que tenga Media (10°-13°) tiene una probabilidad del 29% de leer un libro en los ultimos 12 meses.
+*Para una persona que sea Mujer, qye tenga Superior (Técnica, Tecnológica, Universitaria - pregrado) o	Posgrado (especialización, maestría, doctorado)  tiene una probabilidad del 43% de leer un libro en los ultimos 12 meses.
+
+margins, at(Age= 33.50123 Gender= .6216246 studying= .6971132 hicome= 43.86992 skin= .722475  married= 0 educationlevel = (1(1)5) )
+
+**PARA UNA PERSONA CON ESTADO CIVIL  SOLTERO
+*Para una persona con estado civil soltero, que no tenga ningun estudio tiene una probabilidad del 6% de leer un libro en los ultimos 12 meses.
+*Para una persona con estado civil soltero, que  tenga prescolar tiene una probabilidad del 11% de leer un libro en los ultimos 12 meses.
+*Para una persona con estado civil soltero, que tenga Básica Primaria (1°-5°) y Básica Secundaria (6°-9°) tiene una probabilidad del 18% de leer un libro en los ultimos 12 meses.
+*Para una persona con estado civil soltero, que tenga Media (10°-13°) tiene una probabilidad del 29% de leer un libro en los ultimos 12 meses.
+*Para una persona con estado civil soltero, que tenga Superior (Técnica, Tecnológica, Universitaria - pregrado) o	Posgrado (especialización, maestría, doctorado)  tiene una probabilidad del 43% de leer un libro en los ultimos 12 meses.
+
+margins, at(Age= 33.50123 Gender= .6216246 studying= .6971132 hicome= 43.86992 skin= .722475  married= 1 educationlevel = (1(1)5) )
+
+*PARA UNA PERSONA CON ESTADO CIVIL DIFERENTE  A SOLTERO
+*Para una persona con estado civil diferente a soltero, que no tenga ningun estudio tiene una probabilidad del 2% de leer un libro en los ultimos 12 meses.
+*Para una persona con estado civil diferente a soltero, que  tenga prescolar tiene una probabilidad del 5% de leer un libro en los ultimos 12 meses.
+*Para una persona con estado civil diferente a soltero, que tenga Básica Primaria (1°-5°) y Básica Secundaria (6°-9°) tiene una probabilidad del 8% de leer un libro en los ultimos 12 meses.
+*Para una persona con estado civil diferente a soltero, que tenga Media (10°-13°) tiene una probabilidad del 14% de leer un libro en los ultimos 12 meses.
+*Para una persona con estado civil diferente a soltero, que tenga Superior (Técnica, Tecnológica, Universitaria - pregrado) o	Posgrado (especialización, maestría, doctorado)  tiene una probabilidad del 24% de leer un libro en los ultimos 12 meses.
+
+predict SproSihaleido,p
+estat classification
+lsens
+estat classification,cutoff(0.30)
+estat gof,group(10)
+estat gof
